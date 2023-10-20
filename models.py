@@ -1,12 +1,12 @@
 from sqlalchemy import Boolean,Column,ForeignKey,Integer,String
-from database import base
+from database import Base
 
-class Questions(base):
+class Questions(Base):
     __tablename__='questions'
     id=Column(Integer,primary_key=True,index=True)
-    questions_text=Column(String,index=True)
+    question_text=Column(String,index=True)
 
-class Choices(base):
+class Choices(Base):
     __tablename__='choices'
     id=Column(Integer,primary_key=True,index=True)
     choice_text=Column(String,index=True)

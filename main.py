@@ -1,14 +1,22 @@
 from fastapi import FastAPI,Depends, HTTPException
-from typing import Annotated
-from model import ChoiceBase, QuestionBase
-from database import engine,localSession
+from typing import Annotated,List
+from pydantic import BaseModel
+from database import engine,SessionLocal
 from sqlalchemy.orm import Session
-import db_models
+import models
 
 
 app=FastAPI()
 
-db_models.base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
+
+class ChoiceBase(BaseModel):
+    choice_text:str
+    is_correct: bool
+
+class QuestionBase(BaseModel):
+    question_text:str
+    choices: List[ChoiceBase]
 
 def get_db():
     db=localSession()
@@ -18,9 +26,6 @@ def get_db():
         db.close()
 
 db_dependency=Annotated[Session,Depends(get_db)]
-@app.get("/")
-async def root():
-    return {"message":"hi"}
 
 @app.post("/questions/")
 async def create_questions(question: QuestionBase,db=db_dependency):
@@ -29,6 +34,6 @@ async def create_questions(question: QuestionBase,db=db_dependency):
     db.commit()
     db.refresh(db_question)
     for choice in question.choices:
-        db_choice=models.Choices(choice_text=choice.choice_text,is_correct=choice.is_correct)
+        db_choice=models.Choices(choice_text=choices.choice_text,is_correct=choices.is_correct,question_id=db_question.id)
         db.add(db_choice)
     db.commit()

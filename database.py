@@ -6,6 +6,6 @@ url_db="postgresql://postgres:root@localhost:5432/connections"
 
 engine=create_engine(url_db)
 
-localSession=sessionmaker(autocommit=False,autoflush=False,bind=engine)
+SessionLocal=sessionmaker(bind=engine)
 
-base=declarative_base()
+Base=declarative_base()
