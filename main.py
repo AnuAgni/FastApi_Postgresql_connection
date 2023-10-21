@@ -26,6 +26,18 @@ def get_db():
         db.close()
 
 #db_dependency=Annotated[Session, Depends(get_db)]
+@app.get("/questions/{question_id}")
+async def read_question(question_id: int,db: Session=Depends(get_db)):
+    result = db.query(models.Questions).filter(models.Questions.id==question_id).first()
+    if not result:
+        raise HTTPException(status_code=404,details='Question not found')
+    return result
+@app.get("/choices/{question_id}")
+async def read_choices(question_id: int,db:Session=Depends(get_db)):
+        result=db.query(models.Choices).filter(models.Choices.question_id==question_id).all()
+        if not result:
+            raise HTTPException(status_code=404,details='Choices not found')
+        return result
 
 @app.post("/questions/")
 async def create_questions(question: QuestionBase,db:Session=Depends(get_db)):
